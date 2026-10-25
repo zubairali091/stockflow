@@ -25,6 +25,7 @@ import Categories from "./pages/Categories";
 import Reports from "./pages/Reports";
 import Users from "./pages/Users";
 import SettingsPage from "./pages/Settings";
+import ManagerDashboard from "./pages/ManagerDashboard";
 
 import {
   initialProducts,
@@ -467,61 +468,79 @@ function Dashboard({ products, onNavigate }) {
   );
 }
 
+const permissions = {
+  admin: ["dashboard", "products", "categories", "reports", "users", "settings"],
+  manager: ["dashboard", "products", "categories", "reports"],
+  staff: ["dashboard", "products"],
+};
+
 export default function App() {
   const [activePage, setActivePage] = useState("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [products, setProducts] = useState(initialProducts);
+  const [currentRole, setCurrentRole] = useState("admin");
 
   const handleAddProduct = (newProduct) => {
-    setProducts((previousProducts) => [
-      newProduct,
-      ...previousProducts,
-    ]);
+    if (!permissions[currentRole]?.includes("products") || currentRole === "staff") return;
+    setProducts((previousProducts) => [newProduct, ...previousProducts]);
   };
 
   const handleNavigate = (page) => {
+    if (!permissions[currentRole]?.includes(page)) return;
     setActivePage(page);
     setMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const renderPage = () => {
+    if (!permissions[currentRole]?.includes(activePage)) {
+      return (
+        <div className="dashboard-content">
+          <h2>Access Denied</h2>
+          <p>You do not have permission to access this page.</p>
+        </div>
+      );
+    }
+
     switch (activePage) {
       case "dashboard":
-        return (
-          <Dashboard
-            products={products}
-            onNavigate={handleNavigate}
-          />
-        );
+        if (currentRole === "manager") {
+          return <ManagerDashboard products={products} onNavigate={handleNavigate} />;
+        }
+        if (currentRole === "staff") {
+          return (
+            <div className="dashboard-content">
+              <section className="welcome-row">
+                <div>
+                  <div className="welcome-eyebrow">STAFF WORKSPACE</div>
+                  <h2>Welcome back, Staff</h2>
+                  <p>View inventory products and current stock levels.</p>
+                </div>
+                <button className="button button-primary" type="button" onClick={() => handleNavigate("products")}>View Products</button>
+              </section>
+            </div>
+          );
+        }
+        return <Dashboard products={products} onNavigate={handleNavigate} />;
 
       case "products":
         return (
           <Products
             products={products}
             onAddProduct={handleAddProduct}
+            role={currentRole}
           />
         );
-
       case "categories":
         return <Categories />;
-
       case "reports":
         return <Reports products={products} />;
-
       case "users":
         return <Users />;
-
       case "settings":
         return <SettingsPage />;
-
       default:
-        return (
-          <Dashboard
-            products={products}
-            onNavigate={handleNavigate}
-          />
-        );
+        return <Dashboard products={products} onNavigate={handleNavigate} />;
     }
   };
 
@@ -536,27 +555,34 @@ export default function App() {
         />
       )}
 
-      <div
-        className={
-          mobileMenuOpen
-            ? "sidebar-wrap mobile-open"
-            : "sidebar-wrap"
-        }
-      >
+      <div className={mobileMenuOpen ? "sidebar-wrap mobile-open" : "sidebar-wrap"}>
         <Sidebar
           activePage={activePage}
           onNavigate={handleNavigate}
+          role={currentRole}
         />
       </div>
 
       <main className="main-content">
+        <div className="role-switcher">
+          <span>Preview Dashboard:</span>
+          <select
+            value={currentRole}
+            onChange={(e) => {
+              setCurrentRole(e.target.value);
+              setActivePage("dashboard");
+              setMobileMenuOpen(false);
+            }}
+          >
+            <option value="admin">Administrator</option>
+            <option value="manager">Manager</option>
+            <option value="staff">Staff</option>
+          </select>
+        </div>
         <Navbar
           activePage={activePage}
-          onMenuClick={() =>
-            setMobileMenuOpen((isOpen) => !isOpen)
-          }
+          onMenuClick={() => setMobileMenuOpen((isOpen) => !isOpen)}
         />
-
         {renderPage()}
       </main>
     </div>

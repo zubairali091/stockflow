@@ -16,35 +16,55 @@ const menuItems = [
     label: "Dashboard",
     icon: LayoutDashboard,
     page: "dashboard",
+    roles: ["admin", "manager", "staff"],
   },
   {
     label: "Products",
     icon: Package,
     page: "products",
+    roles: ["admin", "manager", "staff"],
   },
   {
     label: "Categories",
     icon: Tags,
     page: "categories",
+    roles: ["admin", "manager"],
   },
   {
     label: "Reports",
     icon: BarChart3,
     page: "reports",
+    roles: ["admin", "manager"],
   },
   {
     label: "Users",
     icon: Users,
     page: "users",
+    roles: ["admin"],
   },
   {
     label: "Settings",
     icon: Settings,
     page: "settings",
+    roles: ["admin"],
   },
 ];
 
-export default function Sidebar({ activePage, onNavigate }) {
+export default function Sidebar({
+  activePage,
+  onNavigate,
+  role = "admin",
+}) {
+  const visibleMenu = menuItems.filter((item) =>
+    item.roles.includes(role)
+  );
+
+  const roleNames = {
+    admin: "Administrator",
+    manager: "Manager",
+    staff: "Staff Member",
+  };
+
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -69,19 +89,12 @@ export default function Sidebar({ activePage, onNavigate }) {
       </div>
 
       <nav className="sidebar-nav" aria-label="Main navigation">
-        <span className="nav-heading">MENU</span>
+        <span className="nav-heading">
+          {roleNames[role] || "MENU"}
+        </span>
 
-        {menuItems.map(({ label, icon: Icon, page }) => {
+        {visibleMenu.map(({ label, icon: Icon, page }) => {
           const isActive = activePage === page;
-
-          const isAvailable = [
-            "dashboard",
-            "products",
-            "categories",
-            "reports",
-            "users",
-            "settings",
-          ].includes(page);
 
           return (
             <button
@@ -89,19 +102,15 @@ export default function Sidebar({ activePage, onNavigate }) {
               key={page}
               className={`nav-item ${isActive ? "active" : ""}`}
               aria-current={isActive ? "page" : undefined}
-              onClick={() => {
-                if (isAvailable) {
-                  onNavigate(page);
-                } else {
-                  alert(`${label} module will be added later.`);
-                }
-              }}
+              onClick={() => onNavigate(page)}
             >
               <Icon size={19} strokeWidth={1.8} />
 
               <span>{label}</span>
 
-              {isActive && <span className="active-indicator" />}
+              {isActive && (
+                <span className="active-indicator" />
+              )}
             </button>
           );
         })}

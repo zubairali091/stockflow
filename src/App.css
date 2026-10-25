@@ -1212,3 +1212,85 @@
     transition-duration: 0.01ms !important;
   }
 }
+/* Manager Dashboard */
+
+.manager-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.manager-action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px;
+  border: 1px solid #e8edf4;
+  border-radius: 10px;
+  background: #f9fafe;
+  color: #53617a;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.manager-action:hover {
+  background: #f2f5ff;
+  border-color: #d8e0fb;
+}
+
+.manager-action div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.manager-action strong {
+  color: #29374d;
+  font-size: 11px;
+}
+
+.manager-action span {
+  color: #929db0;
+  font-size: 9px;
+}
+
+.manager-action > svg {
+  flex: 0 0 auto;
+  color: #6177df;
+}/* Temporary role preview */
+
+.role-switcher {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 36px;
+  background: #ffffff;
+  border-bottom: 1px solid #e9edf4;
+}
+
+.role-switcher span {
+  color: #697997;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-switcher select {
+  padding: 9px 12px;
+  border: 1px solid #dce3ef;
+  border-radius: 7px;
+  background: #f8faff;
+  color: #26354b;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .role-switcher {
+    padding: 12px 15px;
+  }
+}
